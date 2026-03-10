@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Placement Portal V2</title>
+ 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+       
+            --primary-bg: #eef2f5; 
+            --sidebar-bg: #1e293b; 
+            --sidebar-text: #cbd5e1;
+            --sidebar-hover: #334155;
+            --brand-main: #0284c7; 
+            --brand-dark: #0369a1; 
+            --brand-light: #e0f2fe; 
+            --text-main: #1e293b; 
+            --text-muted: #64748b;
+        }
+        
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            background-color: var(--primary-bg); 
+            color: var(--text-main);
+        }
+        
+        h1, h2, h3, h4, h5, h6, .navbar-brand {
+            font-family: 'Poppins', sans-serif;
+        }
+  
+        .navbar { background-color: var(--sidebar-bg) !important; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 12px 0; }
+        .navbar-brand { color: #ffffff !important; }
+        
+        .sidebar-desktop { 
+            min-height: calc(100vh - 70px); 
+            background: var(--sidebar-bg); 
+            box-shadow: 4px 0 20px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+        .nav-link { color: var(--sidebar-text); font-weight: 600; margin-bottom: 6px; padding: 12px 18px; border-radius: 8px; transition: all 0.3s ease; }
+        .nav-link:hover, .nav-link.router-link-active { color: #ffffff; background: var(--sidebar-hover); transform: translateX(5px); }
+        .nav-link i { margin-right: 12px; font-size: 1.2rem; color: #94a3b8; transition: color 0.3s; }
+        .nav-link:hover i, .nav-link.router-link-active i { color: #ffffff; }
+
+        .card { border: none; border-top: 4px solid var(--brand-main); border-radius: 12px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); transition: transform 0.2s ease, box-shadow 0.2s ease; background: white; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08); }
+
+        .stat-card { padding: 24px; text-align: center; position: relative; overflow: hidden; border-top: none; border-left: 5px solid var(--brand-main); }
+        .stat-icon-wrapper { width: 55px; height: 55px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 1.6rem; margin-bottom: 12px; }
+        .stat-card.students { border-left-color: #0284c7; }
+        .stat-card.students .stat-icon-wrapper { background: #e0f2fe; color: #0284c7; }
+        .stat-card.companies { border-left-color: #6366f1; } 
+        .stat-card.companies .stat-icon-wrapper { background: #e0e7ff; color: #6366f1; } 
+        .stat-card.drives { border-left-color: #059669; } 
+        .stat-card.drives .stat-icon-wrapper { background: #d1fae5; color: #059669; } 
+
+        .status-Applied { color: #0284c7; font-weight: 700; background: #e0f2fe; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #bae6fd; }
+        .status-Shortlisted { color: #4338ca; font-weight: 700; background: #e0e7ff; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #c7d2fe; }
+        .status-Interview { color: #b45309; font-weight: 700; background: #fef3c7; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #fde68a; }
+        .status-Selected { color: #047857; font-weight: 700; background: #d1fae5; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #a7f3d0; }
+        .status-Rejected { color: #be123c; font-weight: 700; background: #ffe4e6; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #fecaca; }
+        .status-Closed { color: #475569; font-weight: 700; background: #f1f5f9; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; border: 1px solid #cbd5e1; }
+        
+        .auth-wrapper { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); padding: 20px; }
+        .auth-container { width: 100%; max-width: 440px; background: #ffffff; padding: 45px; border-radius: 16px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+        .auth-logo { text-align: center; margin-bottom: 30px; }
+        .auth-logo i { font-size: 3rem; color: #ffffff; background: var(--brand-main); padding: 15px; border-radius: 16px; display: inline-block; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.4); }
+        
+        .table-light { background-color: #f8fafc; color: var(--text-muted); }
+        th { font-weight: 700; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 0.5px; color: var(--text-muted); border-bottom: 2px solid #e2e8f0 !important; }
+        td { padding: 15px 10px !important; vertical-align: middle; border-bottom: 1px solid #f1f5f9; }
+        
+        .btn-primary { background-color: var(--brand-main); border-color: var(--brand-main); color: white; border-radius: 8px; padding: 10px 20px; font-weight: 600; font-family: 'Poppins', sans-serif; transition: all 0.2s; }
+        .btn-primary:hover { background-color: var(--brand-dark); border-color: var(--brand-dark); transform: translateY(-1px); box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); }
+        
+        .btn-outline-primary { color: var(--brand-main); border-color: var(--brand-main); background: transparent; border-radius: 8px; font-weight: 600; }
+        .btn-outline-primary:hover { background: var(--brand-main); color: white; border-color: var(--brand-main); }
+
+        .form-control, .form-select { border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 15px; background-color: #ffffff; font-weight: 500; transition: all 0.2s; }
+        .form-control:focus, .form-select:focus { border-color: var(--brand-main); box-shadow: 0 0 0 3px var(--brand-light); }
+        label { font-weight: 700; color: var(--text-main); font-size: 0.85rem; margin-bottom: 8px; display: block; text-transform: uppercase; letter-spacing: 0.5px; }
+
+       
+        .custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 1050; display: flex; align-items: center; justify-content: center; }
+        .custom-modal-content { background: white; border-radius: 12px; width: 100%; max-width: 500px; padding: 30px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); position: relative; max-height: 90vh; overflow-y: auto; }
+        .custom-modal-close { position: absolute; top: 20px; right: 20px; background: none; border: none; font-size: 1.5rem; color: #64748b; cursor: pointer; transition: color 0.2s; }
+        .custom-modal-close:hover { color: #1e293b; }
+        .detail-row { display: flex; justify-content: space-between; border-bottom: 1px solid #f1f5f9; padding: 12px 0; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: #64748b; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+        .detail-value { font-weight: 700; color: #1e293b; text-align: right; max-width: 60%; word-break: break-word;}
+
+        @media (max-width: 768px) {
+            .sidebar-desktop { display: none; }
+            .content-area { padding: 15px !important; }
+            .card:hover { transform: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+
+        <nav class="navbar navbar-expand-lg sticky-top" v-if="isAuthenticated">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand fw-bold d-flex align-items-center" href="#" style="font-size: 1.4rem;">
+                    <div style="background: var(--brand-main); color: #ffffff; padding: 6px 10px; border-radius: 8px; margin-right: 12px; font-size: 1.1rem;">
+                        <i class="bi bi-mortarboard-fill"></i>
+                    </div>
+                    CampusConnect
+                </a>
+                
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#mobileMenu" style="background: var(--sidebar-hover); color: #fff; border-radius: 8px;">
+                    <i class="bi bi-list fs-4"></i>
+                </button>
+                
+                <div class="collapse navbar-collapse" id="mobileMenu">
+                
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 d-md-none mt-3 border-top border-secondary pt-3">
+                        <template v-if="userRole === 'admin'">
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/admin"><i class="bi bi-grid-fill"></i> Dashboard</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/admin/approvals"><i class="bi bi-check-circle-fill"></i> Approvals</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/admin/users"><i class="bi bi-people-fill"></i> Manage Users</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/admin/drives"><i class="bi bi-briefcase-fill"></i> All Drives</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/admin/applications"><i class="bi bi-file-earmark-text-fill"></i> Applications Log</router-link></li>
+                        </template>
+                        <template v-if="userRole === 'company'">
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/company"><i class="bi bi-briefcase-fill"></i> My Drives</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/company/create"><i class="bi bi-plus-circle-fill"></i> Post Drive</router-link></li>
+                        </template>
+                        <template v-if="userRole === 'student'">
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/student"><i class="bi bi-search"></i> Find Drives</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/student/applications"><i class="bi bi-journal-bookmark-fill"></i> My Applications</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link text-light" to="/student/profile"><i class="bi bi-person-badge-fill"></i> Profile</router-link></li>
+                        </template>
+                    </ul>
+                    
+                    <div class="d-flex ms-auto align-items-center mt-3 mt-md-0">
+                        <div class="d-flex align-items-center me-4" style="background: var(--sidebar-hover); padding: 5px 15px; border-radius: 8px;">
+                            <i class="bi bi-person-circle text-light me-2 fs-5"></i>
+                            <span class="fw-bold text-light" style="font-size: 0.9rem;">[[ userRole.toUpperCase() ]]</span>
+                        </div>
+                        <button class="btn btn-outline-light btn-sm rounded px-3 py-2 fw-bold" @click="logout">
+                            Log out <i class="bi bi-box-arrow-right ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container-fluid p-0" v-if="isAuthenticated">
+            <div class="row g-0">
+
+                <div class="col-md-2 sidebar-desktop p-4 d-none d-md-block">
+                    <p class="text-uppercase fw-bold small mb-3 ps-2" style="color: #64748b; letter-spacing: 1px;">Navigation</p>
+                    <ul class="nav flex-column">
+                        <template v-if="userRole === 'admin'">
+                            <li class="nav-item"><router-link class="nav-link" to="/admin"><i class="bi bi-grid-fill"></i> Dashboard</router-link></li>
+                            <li class="nav-item">
+                                <router-link class="nav-link d-flex justify-content-between align-items-center" to="/admin/approvals">
+                                    <span><i class="bi bi-check-circle-fill"></i> Approvals</span>
+                                    <span v-if="pendingCompanyCount > 0" class="badge bg-danger rounded-pill shadow-sm">[[ pendingCompanyCount ]]</span>
+                                </router-link>
+                            </li>
+                            <li class="nav-item"><router-link class="nav-link" to="/admin/users"><i class="bi bi-people-fill"></i> Manage Users</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link" to="/admin/drives"><i class="bi bi-briefcase-fill"></i> All Drives</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link" to="/admin/applications"><i class="bi bi-file-earmark-text-fill"></i> Applications Log</router-link></li>
+                        </template>
+                        <template v-if="userRole === 'company'">
+                            <li class="nav-item"><router-link class="nav-link" to="/company"><i class="bi bi-briefcase-fill"></i> Active Drives</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link" to="/company/create"><i class="bi bi-plus-circle-fill"></i> Post New Drive</router-link></li>
+                        </template>
+                        <template v-if="userRole === 'student'">
+                            <li class="nav-item"><router-link class="nav-link" to="/student"><i class="bi bi-search"></i> Explore Drives</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link" to="/student/applications"><i class="bi bi-journal-bookmark-fill"></i> My Applications</router-link></li>
+                            <li class="nav-item"><router-link class="nav-link" to="/student/profile"><i class="bi bi-person-badge-fill"></i> My Profile</router-link></li>
+                        </template>
+                    </ul>
+                </div>
+                
+             
+                <div class="col-md-10 content-area p-4 p-md-5">
+                    <router-view></router-view>
+                </div>
+            </div>
+        </div>
+
+     
+        <div v-if="!isAuthenticated">
+            <router-view></router-view>
+        </div>
+    </div>
+
+    <template id="login-template">
+        <div class="auth-wrapper">
+            <div class="auth-container">
+                <div class="auth-logo">
+                    <i class="bi bi-building"></i>
+                </div>
+                <h3 class="fw-bold mt-2 text-dark text-center">CampusConnect</h3>
+                <p class="text-muted text-center mb-4">Secure Corporate Portal</p>
+                <form @submit.prevent="login">
+                    <div class="mb-3">
+                        <label>Username</label>
+                        <input type="text" class="form-control" v-model="username" placeholder="Enter your username" required>
+                    </div>
+                    <div class="mb-4">
+                        <label>Password</label>
+                        <input type="password" class="form-control" v-model="password" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 py-2 fs-6 mt-2">Secure Login</button>
+                </form>
+                <p class="mt-4 text-center text-muted fw-bold small">No account yet? <router-link to="/register" style="color: var(--brand-main); text-decoration: none;">Register here</router-link></p>
+            </div>
+        </div>
+    </template>
+
+  
+    <template id="register-template">
+        <div class="auth-wrapper py-5">
+            <div class="auth-container" style="max-width: 600px;">
+                <h3 class="text-center fw-bold mb-2 text-dark">Portal Registration</h3>
+                <p class="text-center text-muted mb-4 pb-3 border-bottom">Create a new organizational or student profile</p>
+                <form @submit.prevent="register">
+                    <div class="mb-4">
+                        <label>Select Profile Type</label>
+                        <select class="form-select" v-model="role" required>
+                            <option value="student">🎓 Student Candidate</option>
+                            <option value="company">🏢 Corporate HR Partner</option>
+                        </select>
+                    </div>
+                    
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label>System Username</label>
+                            <input type="text" class="form-control" v-model="username" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label>Secure Password</label>
+                            <input type="password" class="form-control" v-model="password" required>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label>Official Email Address</label>
+                        <input type="email" class="form-control" v-model="email" required>
+                    </div>
+                    
+           
+                    <div v-if="role === 'student'" class="p-4 rounded-3 mb-4" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <h6 class="text-dark fw-bold mb-3"><i class="bi bi-person-lines-fill me-2" style="color: var(--brand-main);"></i>Academic Details</h6>
+                        <div class="mb-3">
+                            <label>Full Legal Name</label>
+                            <input type="text" class="form-control bg-white" v-model="fullname" required>
+                        </div>
+                        <div class="row g-3">
+                            <div class="col-4">
+                                <label>CGPA</label>
+                                <input type="number" step="0.01" min="0" max="10" class="form-control bg-white" v-model="cgpa" required>
+                            </div>
+                            <div class="col-4">
+                                <label>Branch</label>
+                                <input type="text" class="form-control bg-white" v-model="branch" required>
+                            </div>
+                            <div class="col-4">
+                                <label>Grad Year</label>
+                                <input type="number" class="form-control bg-white" v-model="graduation_year" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="role === 'company'" class="p-4 rounded-3 mb-4" style="background: #f8fafc; border: 1px solid #e2e8f0;">
+                        <h6 class="text-dark fw-bold mb-3"><i class="bi bi-building me-2" style="color: #6366f1;"></i>Corporate Details</h6>
+                        <div class="mb-3">
+                            <label>Registered Company Name</label>
+                            <input type="text" class="form-control bg-white" v-model="company_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>HR Point of Contact</label>
+                            <input type="text" class="form-control bg-white" v-model="hr_contact" required>
+                        </div>
+                        <div class="mb-3">
+                            <label>Corporate Website (Optional)</label>
+                            <input type="url" class="form-control bg-white" placeholder="https://" v-model="website">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-2 fs-6 mt-2">Submit Registration</button>
+                </form>
+                <p class="mt-4 text-center fw-bold small"><router-link to="/login" class="text-muted text-decoration-none"><i class="bi bi-arrow-left me-1"></i> Return to Login</router-link></p>
+            </div>
+        </div>
+    </template>
+
+
+    <template id="admin-dash-template">
+        <div>
+            <h3 class="fw-bold mb-4 text-dark border-bottom pb-2">Executive Dashboard</h3>
+            <div class="row g-4 mb-5">
+                <div class="col-md-4">
+                    <div class="card stat-card students">
+                        <div class="stat-icon-wrapper">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark mb-1">[[ stats.students || 0 ]]</h2>
+                        <span class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Registered Students</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card companies">
+                        <div class="stat-icon-wrapper">
+                            <i class="bi bi-buildings-fill"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark mb-1">[[ stats.companies || 0 ]]</h2>
+                        <span class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Corporate Partners</span>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card stat-card drives">
+                        <div class="stat-icon-wrapper">
+                            <i class="bi bi-briefcase-fill"></i>
+                        </div>
+                        <h2 class="fw-bold text-dark mb-1">[[ stats.drives || 0 ]]</h2>
+                        <span class="text-muted fw-bold text-uppercase small" style="letter-spacing: 0.5px;">Placement Drives</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-2 g-4">
+                <div class="col-md-7">
+                    <div class="card p-4 h-100" style="border-top-color: #64748b;">
+                        <h6 class="fw-bold text-dark mb-4 text-uppercase">System Entities Overview</h6>
+                        <div style="max-height: 280px; display: flex; justify-content: center;">
+                            <canvas id="adminChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-5">
+                    <div class="card p-4 h-100 d-flex flex-column justify-content-center text-center" style="border-top-color: #f59e0b; background-color: #fffbeb;">
+                        <div class="mx-auto bg-white rounded-circle d-flex align-items-center justify-content-center mb-3 shadow-sm" style="width: 70px; height: 70px;">
+                            <i class="bi bi-shield-lock-fill fs-2 text-warning"></i>
+                        </div>
+                        <h5 class="fw-bold text-dark mb-2">Authorization Queue</h5>
+                        <p class="px-3 mb-4 text-muted small">New corporate registrations and placement drives are awaiting executive review.</p>
+                        <button class="btn btn-dark px-4 py-2 mx-auto fw-bold" @click="$router.push('/admin/approvals')">Review Pending Items</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="admin-approvals-template">
+        <div>
+            <h3 class="fw-bold mb-4 text-dark border-bottom pb-2">Action Center</h3>
+            
+            <div class="card p-4 mb-5" style="border-top-color: #6366f1;">
+                <h6 class="fw-bold mb-4 text-dark text-uppercase"><i class="bi bi-building me-2 text-muted"></i> Pending Corporate Accounts</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th class="ps-3">Company Name</th><th>Status</th><th class="text-end pe-3">Action</th></tr></thead>
+                        <tbody>
+                            <tr v-if="pendingCompanies.length === 0"><td colspan="3" class="text-center text-muted py-5">No pending company approvals at this time.</td></tr>
+                            <tr v-for="c in pendingCompanies" :key="c.company_id">
+                                <td class="fw-bold text-dark ps-3">[[ c.company_name ]]</td>
+                                <td><span class="badge bg-warning text-dark px-3 py-1 rounded">Pending Review</span></td>
+                                <td class="text-end pe-3">
+                                    <button class="btn btn-sm btn-success px-3 me-2 fw-bold" @click="actionCompany(c.company_id, 'approve')"><i class="bi bi-check-lg"></i> Approve</button>
+                                    <button class="btn btn-sm btn-danger px-3 fw-bold" @click="actionCompany(c.company_id, 'reject')"><i class="bi bi-x-lg"></i> Reject</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card p-4" style="border-top-color: #059669;">
+                <h6 class="fw-bold mb-4 text-dark text-uppercase"><i class="bi bi-briefcase me-2 text-muted"></i> Pending Placement Drives</h6>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th class="ps-3">Job Title</th><th>Company</th><th>Deadline</th><th class="text-end pe-3">Action</th></tr></thead>
+                        <tbody>
+                            <tr v-if="pendingDrives.length === 0"><td colspan="4" class="text-center text-muted py-5">No pending job drives at this time.</td></tr>
+                            <tr v-for="d in pendingDrives" :key="d.drive_id">
+                                <td class="fw-bold text-dark ps-3">[[ d.job_title ]]</td>
+                                <td><span class="text-muted fw-semibold">[[ d.company ]]</span></td>
+                                <td class="fw-bold text-danger">[[ d.application_deadline ]]</td>
+                                <td class="text-end pe-3">
+                                    <button class="btn btn-sm btn-success px-3 me-2 fw-bold" @click="actionDrive(d.drive_id, 'approve')"><i class="bi bi-check-lg"></i> Approve</button>
+                                    <button class="btn btn-sm btn-danger px-3 fw-bold" @click="actionDrive(d.drive_id, 'reject')"><i class="bi bi-x-lg"></i> Reject</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    
+    <template id="admin-users-template">
+        <div>
+            <h3 class="fw-bold mb-4 text-dark border-bottom pb-2">User Directory</h3>
+            <div class="card p-4 mb-4" style="border-top-color: #94a3b8;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="mb-2">Search Users</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0 bg-light" placeholder="Search by name or email..." v-model="searchQuery">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-0 overflow-hidden" style="border-top-color: #94a3b8;">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th class="ps-4">Name</th><th>Email Address</th><th>Role</th><th>Status</th><th class="text-end pe-4">Action</th></tr></thead>
+                        <tbody>
+                            <tr v-for="user in filteredUsers" :key="user.user_id">
+                                <td class="fw-bold text-dark ps-4">[[ user.name ]]</td>
+                                <td class="text-muted fw-semibold">[[ user.email ]]</td>
+                                <td><span class="badge bg-secondary px-2 py-1 rounded">[[ user.type ]]</span></td>
+                                <td>
+                                    <span v-if="user.is_blacklisted" class="badge bg-danger px-2"><i class="bi bi-slash-circle me-1"></i> Blocked</span>
+                                    <span v-else class="badge bg-success px-2"><i class="bi bi-check-circle me-1"></i> Active</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-outline-primary px-3 fw-bold me-2" @click="viewUser(user)"><i class="bi bi-eye"></i> View</button>
+                                    
+                                    <button v-if="user.is_blacklisted" class="btn btn-sm btn-success px-3 fw-bold" @click="toggleBlacklist(user.user_id)"><i class="bi bi-unlock me-1"></i> Unblock</button>
+                                    <button v-else class="btn btn-sm btn-outline-danger px-3 fw-bold" @click="toggleBlacklist(user.user_id)"><i class="bi bi-lock me-1"></i> Block</button>
+                                </td>
+                            </tr>
+                            <tr v-if="filteredUsers.length === 0"><td colspan="5" class="text-center text-muted py-5">No users found.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div v-if="selectedUser" class="custom-modal-overlay" @click.self="selectedUser = null">
+                <div class="custom-modal-content">
+                    <button class="custom-modal-close" @click="selectedUser = null"><i class="bi bi-x-circle-fill"></i></button>
+                    <div class="text-center mb-4">
+                        <div class="bg-primary bg-opacity-10 text-primary mx-auto d-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
+                            <i :class="selectedUser.type === 'Student' ? 'bi bi-mortarboard-fill' : 'bi bi-buildings-fill'"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-1">[[ selectedUser.name ]]</h4>
+                        <span class="badge bg-secondary px-3 py-1">[[ selectedUser.type ]] Profile</span>
+                    </div>
+
+                    <div v-if="selectedUser.type === 'Student'">
+                        <div class="detail-row"><span class="detail-label">Email Address</span><span class="detail-value">[[ selectedUser.email ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Cumulative CGPA</span><span class="detail-value text-primary">[[ selectedUser.cgpa ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Branch / Major</span><span class="detail-value">[[ selectedUser.branch ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Graduation Year</span><span class="detail-value">[[ selectedUser.graduation_year ]]</span></div>
+                        <div class="detail-row">
+                            <span class="detail-label">Resume Link</span>
+                            <span class="detail-value">
+                                <a v-if="selectedUser.resume_link" :href="selectedUser.resume_link" target="_blank" class="text-decoration-none fw-bold">Open Resume <i class="bi bi-box-arrow-up-right ms-1"></i></a>
+                                <span v-else class="text-muted">Not Provided</span>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div v-if="selectedUser.type === 'Company'">
+                        <div class="detail-row"><span class="detail-label">Account Email</span><span class="detail-value">[[ selectedUser.email ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">HR Contact Person</span><span class="detail-value">[[ selectedUser.hr_contact ]]</span></div>
+                        <div class="detail-row">
+                            <span class="detail-label">Corporate Website</span>
+                            <span class="detail-value">
+                                <a v-if="selectedUser.website" :href="selectedUser.website" target="_blank" class="text-decoration-none fw-bold">Visit Site <i class="bi bi-box-arrow-up-right ms-1"></i></a>
+                                <span v-else class="text-muted">Not Provided</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+    
+
+    <template id="admin-drives-template">
+        <div>
+            <h3 class="fw-bold mb-4 text-dark border-bottom pb-2">All Placement Drives</h3>
+            <div class="card p-4 mb-4" style="border-top-color: #059669;">
+                <div class="row">
+                    <div class="col-md-6">
+                        <label class="mb-2">Search Drives</label>
+                        <div class="input-group">
+                            <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0 bg-light" placeholder="Search by role or company..." v-model="searchQuery">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-0 overflow-hidden" style="border-top-color: #059669;">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th class="ps-4">Job Title</th><th>Company</th><th>Deadline</th><th>Status</th><th class="text-end pe-4">Action</th></tr></thead>
+                        <tbody>
+                            <tr v-if="filteredDrives.length === 0"><td colspan="5" class="text-center text-muted py-5">No drives found.</td></tr>
+                            <tr v-for="drive in filteredDrives" :key="drive.drive_id">
+                                <td class="fw-bold text-dark ps-4">[[ drive.job_title ]]</td>
+                                <td class="text-muted fw-semibold">[[ drive.company ]]</td>
+                                <td>[[ drive.application_deadline ]]</td>
+                                <td>
+                                    <span v-if="drive.status === 'Approved'" class="badge bg-success px-2">Approved</span>
+                                    <span v-else-if="drive.status === 'Closed'" class="badge bg-secondary px-2">Closed</span>
+                                    <span v-else :class="'badge px-2 ' + (drive.status === 'Pending' ? 'bg-warning text-dark' : 'bg-danger')">[[ drive.status ]]</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <button class="btn btn-sm btn-outline-primary px-3 fw-bold me-2" @click="viewDrive(drive)"><i class="bi bi-eye"></i> View</button>
+
+                                    <button v-if="drive.status === 'Approved'" class="btn btn-sm btn-outline-danger px-3 fw-bold" @click="closeDrive(drive.drive_id)">
+                                        <i class="bi bi-x-circle me-1"></i> Close Drive
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div v-if="selectedDrive" class="custom-modal-overlay" @click.self="selectedDrive = null">
+                <div class="custom-modal-content">
+                    <button class="custom-modal-close" @click="selectedDrive = null"><i class="bi bi-x-circle-fill"></i></button>
+                    <div class="text-center mb-4 border-bottom pb-4">
+                        <div class="bg-success bg-opacity-10 text-success mx-auto d-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
+                            <i class="bi bi-briefcase-fill"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-1">[[ selectedDrive.job_title ]]</h4>
+                        <p class="text-muted mb-2 fw-bold">[[ selectedDrive.company ]]</p>
+                        <span :class="'badge px-3 py-1 ' + (selectedDrive.status === 'Approved' ? 'bg-success' : (selectedDrive.status === 'Closed' ? 'bg-secondary' : 'bg-warning text-dark'))">Status: [[ selectedDrive.status ]]</span>
+                    </div>
+
+                    <div>
+                        <div class="detail-row flex-column align-items-start">
+                            <span class="detail-label mb-1">Job Description</span>
+                            <span class="detail-value text-start max-width-100 fw-normal text-muted" style="max-width: 100%;">[[ selectedDrive.job_description || 'No description provided.' ]]</span>
+                        </div>
+                        <div class="detail-row"><span class="detail-label">Min CGPA Required</span><span class="detail-value text-primary fs-5">[[ selectedDrive.eligibility_cgpa ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Eligible Branches</span><span class="detail-value">[[ selectedDrive.eligibility_branch ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Target Batch Year</span><span class="detail-value">[[ selectedDrive.eligibility_year ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Application Deadline</span><span class="detail-value text-danger">[[ selectedDrive.application_deadline ]]</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="admin-applications-template">
+        <div>
+            <h3 class="fw-bold mb-4 text-dark border-bottom pb-2">Master Application Log</h3>
+            <div class="card p-0 overflow-hidden" style="border-top-color: #94a3b8;">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th class="ps-4">Candidate Name</th><th>Corporate Partner</th><th>Job Title</th><th>Application Date</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr v-if="applications.length === 0"><td colspan="5" class="text-center text-muted py-5">No applications recorded in the system yet.</td></tr>
+                            <tr v-for="app in applications" :key="app.application_id">
+                                <td class="fw-bold text-dark ps-4">[[ app.student ]]</td>
+                                <td class="fw-semibold text-muted">[[ app.company ]]</td>
+                                <td class="text-dark fw-semibold">[[ app.job_title ]]</td>
+                                <td class="text-muted">[[ app.application_date ]]</td>
+                                <td><span :class="'status-' + app.status.split(' ')[0]">[[ app.status ]]</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+
+   
+    <template id="student-dash-template">
+        <div>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 border-bottom pb-2">
+                <h3 class="fw-bold mb-3 mb-md-0 text-dark">Active Opportunities</h3>
+                <div class="input-group w-auto">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" class="form-control border-start-0 ps-0" style="width: 250px;" placeholder="Search roles or companies..." v-model="searchQuery">
+                </div>
+            </div>
+            
+            <div class="row g-4">
+                <div v-if="filteredDrives.length === 0" class="col-12 text-center text-muted py-5 border rounded bg-white">
+                    <div style="font-size: 3rem; color: #cbd5e1;"><i class="bi bi-folder-x"></i></div>
+                    <h6 class="mt-3 text-dark fw-bold">No drives available</h6>
+                    <p class="small">Check back later for new opportunities matching your criteria.</p>
+                </div>
+                <div class="col-md-6 col-lg-4" v-for="drive in filteredDrives" :key="drive.drive_id">
+                    <div class="card h-100 p-4 d-flex flex-column">
+                        <div class="mb-3 d-flex justify-content-between align-items-start">
+                            <div style="background: var(--brand-light); color: var(--brand-dark); width: 45px; height: 45px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                                <i class="bi bi-briefcase-fill"></i>
+                            </div>
+                            <span class="badge bg-danger rounded px-2 py-1"><i class="bi bi-clock me-1"></i> [[ drive.application_deadline ]]</span>
+                        </div>
+                        <h5 class="fw-bold mb-1 text-dark">[[ drive.job_title ]]</h5>
+                        <h6 class="text-muted fw-bold mb-4">[[ drive.company ]]</h6>
+                        
+                        <button class="btn btn-outline-primary w-100 py-2 mb-3 fw-bold mt-auto" @click="viewDriveDetails(drive)">
+                            <i class="bi bi-info-circle me-1"></i> View Full Details
+                        </button>
+
+                        <button class="btn btn-primary w-100 py-2" @click="apply(drive.drive_id)">
+                            Submit Application <i class="bi bi-arrow-right-short ms-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+       
+            <div v-if="selectedDriveDetails" class="custom-modal-overlay" @click.self="selectedDriveDetails = null">
+                <div class="custom-modal-content">
+                    <button class="custom-modal-close" @click="selectedDriveDetails = null"><i class="bi bi-x-circle-fill"></i></button>
+                    <div class="text-center mb-4 border-bottom pb-4">
+                        <div class="bg-primary bg-opacity-10 text-primary mx-auto d-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
+                            <i class="bi bi-building"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-1">[[ selectedDriveDetails.job_title ]]</h4>
+                        <p class="text-muted mb-0 fw-bold fs-5">[[ selectedDriveDetails.company ]]</p>
+                    </div>
+
+                    <div>
+                        <div class="detail-row flex-column align-items-start">
+                            <span class="detail-label mb-1">Role Description</span>
+                            <span class="detail-value text-start fw-normal text-muted" style="max-width: 100%;">[[ selectedDriveDetails.job_description || 'No description provided by company.' ]]</span>
+                        </div>
+                        <div class="detail-row"><span class="detail-label">Min CGPA Required</span><span class="detail-value text-primary fs-5">[[ selectedDriveDetails.eligibility_cgpa ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Eligible Branches</span><span class="detail-value">[[ selectedDriveDetails.eligibility_branch ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Target Batch Year</span><span class="detail-value">[[ selectedDriveDetails.eligibility_year ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Application Deadline</span><span class="detail-value text-danger">[[ selectedDriveDetails.application_deadline ]]</span></div>
+                    </div>
+                    <button class="btn btn-primary w-100 py-3 mt-4 fs-5" @click="apply(selectedDriveDetails.drive_id); selectedDriveDetails = null;">
+                        Apply For This Role Now
+                    </button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+
+    <template id="student-applications-template">
+        <div>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 border-bottom pb-2">
+                <h3 class="fw-bold mb-3 mb-md-0 text-dark">Application History</h3>
+                <button class="btn btn-outline-primary bg-white shadow-sm fw-bold" @click="exportCSV">
+                    <i class="bi bi-envelope-paper me-2"></i>Email CSV Report
+                </button>
+            </div>
+            
+            <div class="card p-0 overflow-hidden" style="border-top-color: #94a3b8;">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light"><tr><th class="ps-4">Company</th><th>Job Title</th><th>Application Date</th><th>Status</th></tr></thead>
+                        <tbody>
+                            <tr v-if="applications.length === 0"><td colspan="4" class="text-center text-muted py-5">You haven't submitted any applications yet.</td></tr>
+                            <tr v-for="app in applications" :key="app.application_id">
+                                <td class="fw-bold text-dark ps-4">[[ app.company ]]</td>
+                                <td class="fw-semibold text-muted">[[ app.job_title ]]</td>
+                                <td class="text-muted">[[ app.application_date ]]</td>
+                                <td><span :class="'status-' + app.status.split(' ')[0]">[[ app.status ]]</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </template>
+
+  
+    <template id="student-profile-template">
+        <div>
+            <h3 class="fw-bold mb-4 text-dark border-bottom pb-2">Candidate Profile</h3>
+            <form @submit.prevent="updateProfile">
+                <div class="card p-4 p-md-5" style="max-width: 800px; border-top-color: var(--brand-main);">
+                    <div class="d-flex align-items-center mb-4 pb-3 border-bottom">
+                        <div style="background: var(--primary-bg); color: var(--brand-main); width: 60px; height: 60px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin-right: 15px; border: 1px solid #cbd5e1;">
+                            <i class="bi bi-person-badge"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0">Academic Information</h5>
+                            <p class="text-muted small mb-0">Keep your records up to date for recruiters.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label>Full Legal Name</label>
+                            <input type="text" class="form-control" v-model="profile.fullname" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Cumulative CGPA</label>
+                            <input type="number" step="0.01" class="form-control" v-model="profile.cgpa" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Branch / Major</label>
+                            <input type="text" class="form-control" v-model="profile.branch" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Graduation Year</label>
+                            <input type="number" class="form-control" v-model="profile.graduation_year" required>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <label><i class="bi bi-link-45deg"></i> Portfolio / Resume URL</label>
+                            <input type="url" class="form-control" v-model="profile.resume_link" placeholder="https://drive.google.com/..." required>
+                            <small class="text-muted mt-2 d-block"><i class="bi bi-info-circle me-1"></i>Ensure the link visibility is set to 'Anyone with the link can view'.</small>
+                        </div>
+                        <div class="col-12 mt-4 pt-4 border-top">
+                            <button type="submit" class="btn btn-primary px-4 py-2 w-100 w-md-auto">Save Changes <i class="bi bi-check2 ms-1"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </template>
+
+ 
+    <template id="company-dash-template">
+        <div>
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 border-bottom pb-2">
+                <h3 class="fw-bold mb-3 mb-md-0 text-dark">Corporate Dashboard</h3>
+                <button class="btn btn-primary px-4 py-2" @click="$router.push('/company/create')">
+                    <i class="bi bi-plus-lg me-1"></i> Post New Drive
+                </button>
+            </div>
+            
+            <div v-if="drives.length === 0" class="alert bg-white border text-center py-5 shadow-sm rounded">
+                <div style="font-size: 3rem; color: #cbd5e1;"><i class="bi bi-building"></i></div>
+                <h6 class="text-dark fw-bold mt-3">No Active Drives</h6>
+                <p class="text-muted small">You haven't posted any placement drives yet. Click the button above to begin.</p>
+            </div>
+
+            <div class="card p-0 overflow-hidden mb-4" v-for="drive in drives" :key="drive.drive_id" style="border-top-color: #6366f1;">
+                <div class="card-header bg-white p-4 d-flex flex-column flex-md-row justify-content-between align-items-md-center border-bottom">
+                    <div>
+                        <h5 class="fw-bold mb-2 text-dark">[[ drive.job_title ]]</h5>
+                        <span :class="drive.status === 'Approved' ? 'badge bg-success bg-opacity-10 text-success border border-success' : (drive.status === 'Closed' ? 'badge bg-secondary bg-opacity-10 text-secondary border border-secondary' : 'badge bg-warning bg-opacity-10 text-dark border border-warning')">[[ drive.status ]]</span>
+                    </div>
+                    <button class="btn btn-outline-dark mt-3 mt-md-0 px-3 py-2" @click="viewApplicants(drive.drive_id)">
+                        <i class="bi bi-people-fill me-1"></i> View Candidates ([[ drive.applicants ]])
+                    </button>
+                </div>
+                
+                <div v-if="selectedDrive === drive.drive_id" class="p-4 bg-light">
+                    <h6 class="fw-bold text-dark mb-3 text-uppercase"><i class="bi bi-funnel-fill me-2 text-muted"></i>Candidate Pipeline</h6>
+                    <div class="table-responsive bg-white border rounded shadow-sm overflow-hidden">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light"><tr><th class="ps-4">Candidate Name</th><th>CGPA</th><th>Resume</th><th>Pipeline Status</th><th class="text-end pe-4">HR Action</th></tr></thead>
+                            <tbody>
+                                <tr v-if="applicants.length === 0"><td colspan="5" class="text-center text-muted py-4">Awaiting applications.</td></tr>
+                                <tr v-for="app in applicants" :key="app.application_id">
+                                    <td class="fw-bold text-dark ps-4">[[ app.student_name ]]</td>
+                                    <td><span class="badge bg-light border text-dark px-2 py-1 rounded">[[ app.cgpa ]]</span></td>
+                                    <td>
+                                        <a v-if="app.resume_link" :href="app.resume_link" target="_blank" class="text-primary text-decoration-none fw-bold small"><i class="bi bi-box-arrow-up-right me-1"></i> Open</a>
+                                        <span v-else class="text-muted small">Not Provided</span>
+                                    </td>
+                                    <td><span :class="'status-' + app.status.split(' ')[0]">[[ app.status ]]</span></td>
+                                    <td class="text-end pe-4">
+                                        <button class="btn btn-sm btn-outline-primary px-2 fw-bold me-1" @click="viewStudent(app)"><i class="bi bi-person-lines-fill"></i> View</button>
+
+                                        <button v-if="app.status === 'Selected'" class="btn btn-sm btn-success px-2 fw-bold me-1" @click="generateOffer(app, drive.job_title, drive.company_name)">
+                                            <i class="bi bi-file-earmark-check-fill"></i> Generate Offer
+                                        </button>
+
+                                        <div class="dropdown d-inline-block">
+                                            <button class="btn btn-sm btn-outline-secondary fw-bold px-2 dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                                Status
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="border-radius: 8px;">
+                                                <li><a class="dropdown-item text-primary fw-bold" href="#" @click.prevent="updateStatus(app.application_id, 'Shortlisted')">Shortlist</a></li>
+                                                <li><a class="dropdown-item text-warning fw-bold" href="#" @click.prevent="updateStatus(app.application_id, 'Interview')">Interview</a></li>
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li><a class="dropdown-item text-success fw-bold" href="#" @click.prevent="updateStatus(app.application_id, 'Selected')">Final Select</a></li>
+                                                <li><a class="dropdown-item text-danger fw-bold" href="#" @click.prevent="updateStatus(app.application_id, 'Rejected')">Reject</a></li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+          
+            <div v-if="selectedStudent" class="custom-modal-overlay" @click.self="selectedStudent = null">
+                <div class="custom-modal-content">
+                    <button class="custom-modal-close" @click="selectedStudent = null"><i class="bi bi-x-circle-fill"></i></button>
+                    <div class="text-center mb-4">
+                        <div class="bg-primary bg-opacity-10 text-primary mx-auto d-flex align-items-center justify-content-center rounded-circle mb-3" style="width: 60px; height: 60px; font-size: 1.8rem;">
+                            <i class="bi bi-mortarboard-fill"></i>
+                        </div>
+                        <h4 class="fw-bold text-dark mb-1">[[ selectedStudent.student_name ]]</h4>
+                        <span class="badge bg-secondary px-3 py-1">Candidate Profile</span>
+                    </div>
+
+                    <div>
+                        <div class="detail-row"><span class="detail-label">Email Address</span><span class="detail-value">[[ selectedStudent.email ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Cumulative CGPA</span><span class="detail-value text-primary fs-6">[[ selectedStudent.cgpa ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Branch / Major</span><span class="detail-value">[[ selectedStudent.branch ]]</span></div>
+                        <div class="detail-row"><span class="detail-label">Graduation Year</span><span class="detail-value">[[ selectedStudent.graduation_year ]]</span></div>
+                        <div class="detail-row">
+                            <span class="detail-label">Resume / Portfolio</span>
+                            <span class="detail-value">
+                                <a v-if="selectedStudent.resume_link" :href="selectedStudent.resume_link" target="_blank" class="text-decoration-none fw-bold btn btn-sm btn-primary">Open Resume <i class="bi bi-box-arrow-up-right ms-1"></i></a>
+                                <span v-else class="text-muted">Not Provided</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+       
+            <div v-if="selectedOffer" class="custom-modal-overlay" @click.self="selectedOffer = null">
+                <div class="custom-modal-content" style="max-width: 700px; border-radius: 4px;">
+                    <button class="custom-modal-close" @click="selectedOffer = null"><i class="bi bi-x-square-fill text-secondary"></i></button>
+                    
+                    <div style="font-family: 'Times New Roman', serif; color: black; padding: 20px;">
+                        <h3 class="text-center fw-bold border-bottom border-dark pb-2 mb-4" style="font-family: 'Times New Roman', serif;">OFFER OF EMPLOYMENT</h3>
+                        <p class="text-end mb-4">Date: [[ new Date().toLocaleDateString() ]]</p>
+                        <p><strong>Candidate:</strong> [[ selectedOffer.student_name ]]</p>
+                        
+                        <p class="mt-4">Dear [[ selectedOffer.student_name ]],</p>
+                        <p>We are delighted to formally offer you the position of <strong>[[ selectedOffer.job_title ]]</strong> at <strong>[[ selectedOffer.company_name ]]</strong>.</p>
+                        <p>Following a rigorous selection process during the campus placement drive, our team was highly impressed by your academic credentials and professional attitude.</p>
+                        
+                        <div class="bg-light p-3 border border-secondary mt-4 mb-4">
+                            <p class="mb-1"><strong>Role:</strong> [[ selectedOffer.job_title ]]</p>
+                            <p class="mb-1"><strong>Compensation:</strong> As discussed during the final HR interview round.</p>
+                            <p class="mb-0"><strong>Location:</strong> Corporate Headquarters</p>
+                        </div>
+                        
+                        <p>We look forward to welcoming you to our organization.</p>
+                        <p class="mt-4 mb-0">Sincerely,</p>
+                        <p><strong>Human Resources Department</strong><br>[[ selectedOffer.company_name ]]</p>
+                    </div>
+                    
+                    <div class="mt-4 pt-3 border-top d-flex justify-content-end" style="background: white;">
+                        <button class="btn btn-outline-secondary me-2 fw-bold" @click="selectedOffer = null">Cancel</button>
+                        <button class="btn btn-success fw-bold" @click="sendOfferEmail(selectedOffer.application_id)">
+                            <i class="bi bi-envelope-fill me-1"></i> Email Official Offer to Candidate
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </template>
+
+    <template id="company-create-drive-template">
+        <div>
+            <h3 class="fw-bold mb-4 text-dark border-bottom pb-2">Post Job Drive</h3>
+            <form @submit.prevent="submitDrive">
+                <div class="card p-4 p-md-5 border-0 shadow-sm" style="max-width: 800px; border-top: 4px solid #6366f1;">
+                    <div v-if="isPending" class="alert alert-warning border border-warning rounded p-3 d-flex align-items-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill fs-4 me-3 text-warning"></i>
+                        <div>
+                            <strong>Account Verification Pending</strong><br>
+                            <small>Your corporate account must be verified by the Institute Admin before your job drives become active.</small>
+                        </div>
+                    </div>
+                    <div v-else-if="errorMsg" class="alert alert-danger border-0 rounded">[[ errorMsg ]]</div>
+
+                    <h6 class="fw-bold text-dark mb-4 pb-2 border-bottom">Role Specifications</h6>
+                    <div class="row g-4">
+                        <div class="col-12">
+                            <label>Job Title</label>
+                            <input type="text" class="form-control" v-model="form.job_title" placeholder="e.g. Software Development Engineer" :disabled="isPending" required>
+                        </div>
+                        <div class="col-12">
+                            <label>Job Description</label>
+                            <textarea class="form-control" rows="4" v-model="form.job_description" placeholder="Describe responsibilities and requirements..." :disabled="isPending" required></textarea>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Min CGPA Filter</label>
+                            <input type="number" step="0.1" class="form-control" v-model="form.eligibility_cgpa" :disabled="isPending" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Eligible Branches</label>
+                            <input type="text" class="form-control" v-model="form.eligibility_branch" placeholder="e.g. CSE, ECE" :disabled="isPending" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label>Target Batch Year</label>
+                            <input type="number" class="form-control" v-model="form.eligibility_year" placeholder="2026" :disabled="isPending" required>
+                        </div>
+                        <div class="col-md-6 mt-4">
+                            <label class="text-danger"><i class="bi bi-calendar-x me-1"></i>Application Deadline</label>
+                            <input type="date" class="form-control border-danger border-opacity-50" v-model="form.application_deadline" :disabled="isPending" required>
+                        </div>
+                        <div class="col-12 mt-5 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary px-4 py-2" :disabled="isPending">Submit for Approval <i class="bi bi-send-check ms-1"></i></button>
+                            <button type="button" class="btn btn-outline-secondary px-4 py-2 ms-2 fw-bold" @click="$router.push('/company')">Cancel</button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </template>
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://unpkg.com/vue-router@4.0.13/dist/vue-router.global.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script src="/static/app.js"></script>
+
+</body>
+</html>
